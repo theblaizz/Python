@@ -1,56 +1,67 @@
+import pytest
 from selenium import webdriver
-from webdriver_manager.firefox import GeckoDriverManager
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-
-browser = webdriver.Firefox()
-
-browser.get("https://www.saucedemo.com")
-
-element = browser.find_element(By.CSS_SELECTOR, "user-name")
-
-search_input.send_keys("standard_user")
-
-element = browser.find_element(By.CSS_SELECTOR, "password")
-
-search_input.send_keys("secret_sauce")
-
-button = driver.find_element_by_class_name('submit-button btn_action')
-button.click()
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+import time
 
 
-button = driver.find_element_by_class_name('add-to-cart-sauce-labs-backpack')
-button.click()
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    yield driver
+    driver.quit()
 
-button = driver.find_element_by_class_name('add-to-cart-sauce-labs-bolt-t-shirt')
-button.click()
 
-button = driver.find_element_by_class_name('add-to-cart-sauce-labs-onesie')
-button.click()
+def test_saucedemo_shopping(driver):
+    driver.get("https://www.saucedemo.com")
 
-button = driver.find_element_by_class_name('shopping_cart_link')
-button.click()
+    username = driver.find_element(By.CSS_SELECTOR, "#user-name")
+    username.send_keys("standard_user")
 
-button = driver.find_element_by_class_name('btn btn_action btn_medium checkout_button ')
-button.click()
+    password = driver.find_element(By.CSS_SELECTOR, "#password")
+    password.send_keys("secret_sauce")
 
-browser.get("http://the-internet.herokuapp.com/inputs")
+    login_button = driver.find_element(By.CSS_SELECTOR, "#login-button")
+    login_button.click()
 
-element = browser.find_element(By.CSS_SELECTOR, "first-name")
+    backpack_button = driver.find_element(By.CSS_SELECTOR, "#add-to-cart-sauce-labs-backpack")
+    backpack_button.click()
 
-search_input.send_keys("Иван")
+    tshirt_button = driver.find_element(By.CSS_SELECTOR, "#add-to-cart-sauce-labs-bolt-t-shirt")
+    tshirt_button.click()
 
-numder_input.clear()
+    onesie_button = driver.find_element(By.CSS_SELECTOR, "#add-to-cart-sauce-labs-onesie")
+    onesie_button.click()
 
-element = browser.find_element(By.CSS_SELECTOR, "last-name")
+    cart_link = driver.find_element(By.CSS_SELECTOR, ".shopping_cart_link")
+    cart_link.click()
 
-search_input.send_keys("Иванов")
+    checkout_button = driver.find_element(By.CSS_SELECTOR, "#checkout")
+    checkout_button.click()
 
-element = browser.find_element(By.CSS_SELECTOR, "postal-code")
+    wait = WebDriverWait(driver, 10)
+    wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "#first-name")))
 
-search_input.send_keys("111111")
+    first_name = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#first-name")))
+    first_name.send_keys("Ivan")
 
-button = driver.find_element_by_class_name('submit-button btn btn_primary cart_button btn_action')
-button.click()
+    last_name = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#last-name")))
+    last_name.send_keys("Ivanov")
 
-quit()
+    postal_code = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#postal-code")))
+    postal_code.send_keys("111111")
+
+    continue_button = wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, "#continue")))
+    driver.execute_script("arguments[0].scrollIntoView(true);", continue_button)
+    time.sleep(0.3)
+    driver.execute_script("arguments[0].click();", continue_button)
+
+    wait.until(EC.url_contains("checkout-step-two"))
+
+    assert "checkout-step-two" in driver.current_url
+
+    total_element = driver.find_element(By.CSS_SELECTOR, ".summary_total_label")
+    assert total_element.text is not None

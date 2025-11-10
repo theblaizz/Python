@@ -1,24 +1,40 @@
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
-driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    yield driver
+    driver.quit()
 
-element = driver.find_element(By.CSS_SELECTOR, "delay")
 
-search_input.send_keys("45")
+def test_calculator(driver):
+    driver.get("https://bonigarcia.dev/selenium-webdriver-java/slow-calculator.html")
 
-button = driver.find_element_by_class_name('btn-outline-primary >7<')
-button.click()
+    delay_input = driver.find_element(By.CSS_SELECTOR, "#delay")
+    delay_input.clear()
+    delay_input.send_keys("45")
 
-button = driver.find_element_by_class_name('operator btn btn-outline-success')
-button.click()
+    button_7 = driver.find_element(By.XPATH, "//span[text()='7']")
+    button_7.click()
 
-button = driver.find_element_by_class_name('btn-outline-primary >8<')
-button.click()
+    button_plus = driver.find_element(By.XPATH, "//span[text()='+']")
+    button_plus.click()
 
-button = driver.find_element_by_class_name('btn btn-outline-warning')
-button.click()
+    button_8 = driver.find_element(By.XPATH, "//span[text()='8']")
+    button_8.click()
+
+    button_equals = driver.find_element(By.XPATH, "//span[text()='=']")
+    button_equals.click()
+
+    wait = WebDriverWait(driver, 50)
+    result = wait.until(EC.text_to_be_present_in_element((By.CSS_SELECTOR, ".screen"), "15"))
+
+    screen = driver.find_element(By.CSS_SELECTOR, ".screen")
+    assert screen.text == "15"
