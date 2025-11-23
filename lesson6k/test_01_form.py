@@ -1,45 +1,50 @@
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
+import time
 
-driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
 
-driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")
+@pytest.fixture
+def driver():
+    driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+    yield driver
+    driver.quit()
 
-element = driver.find_element(By.CSS_SELECTOR, "first-name")
 
-search_input.send_keys("Иван")
+def test_fill_form(driver):
+    driver.get("https://bonigarcia.dev/selenium-webdriver-java/data-types.html")
 
-element = driver.find_element(By.CSS_SELECTOR, "last-name")
+    first_name = driver.find_element(By.CSS_SELECTOR, "input[name='first-name']")
+    first_name.send_keys("Иван")
 
-search_input.send_keys("Петров")
+    last_name = driver.find_element(By.CSS_SELECTOR, "input[name='last-name']")
+    last_name.send_keys("Петров")
 
-element = driver.find_element(By.CSS_SELECTOR, "address")
+    address = driver.find_element(By.CSS_SELECTOR, "input[name='address']")
+    address.send_keys("Ленина, 55-3")
 
-search_input.send_keys("Ленина, 55-3")
+    email = driver.find_element(By.CSS_SELECTOR, "input[name='e-mail']")
+    email.send_keys("test@skypro.com")
 
-element = driver.find_element(By.CSS_SELECTOR, "e-mail")
+    phone = driver.find_element(By.CSS_SELECTOR, "input[name='phone']")
+    phone.send_keys("+7985899998787")
 
-search_input.send_keys("test@skypro.com")
+    city = driver.find_element(By.CSS_SELECTOR, "input[name='city']")
+    city.send_keys("Москва")
 
-element = driver.find_element(By.CSS_SELECTOR, "phone")
+    country = driver.find_element(By.CSS_SELECTOR, "input[name='country']")
+    country.send_keys("Россия")
 
-search_input.send_keys("+7985899998787")
+    job_position = driver.find_element(By.CSS_SELECTOR, "input[name='job-position']")
+    job_position.send_keys("QA")
 
-element = driver.find_element(By.CSS_SELECTOR, "city")
+    company = driver.find_element(By.CSS_SELECTOR, "input[name='company']")
+    company.send_keys("SkyPro")
 
-search_input.send_keys("Москва")
+    submit_button = driver.find_element(By.CSS_SELECTOR, "button[type='submit']")
+    driver.execute_script("arguments[0].scrollIntoView(true);", submit_button)
+    driver.execute_script("arguments[0].click();", submit_button)
 
-element = driver.find_element(By.CSS_SELECTOR, "country")
-
-search_input.send_keys("Россия")
-
-element = driver.find_element(By.CSS_SELECTOR, "job-position")
-
-search_input.send_keys("QA")
-
-element = driver.find_element(By.CSS_SELECTOR, "company")
-
-search_input.send_keys("SkyPro")
+    assert "data-types" in driver.current_url
