@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
 from Mainpage import SecondPage
+from Mainpage import LoginPage
 @pytest.fixture
 def driver():
     driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
@@ -16,12 +17,6 @@ def driver():
 
 def test_saucedemo_shopping(driver):
     driver.get("https://www.saucedemo.com")
-
-    username = driver.find_element(By.CSS_SELECTOR, "#user-name")
-    username.send_keys("standard_user")
-
-    password = driver.find_element(By.CSS_SELECTOR, "#password")
-    password.send_keys("secret_sauce")
 
     login_button = driver.find_element(By.CSS_SELECTOR, "#login-button")
     login_button.click()
