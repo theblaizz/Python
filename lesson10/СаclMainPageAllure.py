@@ -4,6 +4,10 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class CalcMainPage:
 
+@allure.epic("сайт")
+@allure.feature("Read")
+@allure.
+
     def __init__(self, driver):
         """
          Конструктор класса CalcMainPage.
@@ -11,7 +15,7 @@ class CalcMainPage:
                """
         self._driver = driver
 
-        @allure.step("Открытие страницы калькулятора")
+        with allure.step("Открытие страницы калькулятора")
         """
                Открывает страницу калькулятора.
                """
@@ -19,7 +23,8 @@ class CalcMainPage:
         self._driver.implicitly_wait(2)
         self._driver.maximize_window()
 
-    @allure.step("Установка задержки {delay} секунд")
+
+        with allure.step("Установка задержки {delay} секунд")
     """
          Устанавливает задержку для выполнения операций на калькуляторе.
 
@@ -30,7 +35,7 @@ class CalcMainPage:
         delay_input.clear()
         delay_input.send_keys(str(seconds))
 
-    @allure.step("Нажатие кнопки '{button}'")
+         with allure.step("Нажатие кнопки '{button}'")
     """
           Нажимает на кнопку калькулятора.
 
@@ -40,7 +45,7 @@ class CalcMainPage:
         button = self._driver.find_element(By.XPATH, f"//span[text()='{button_text}']")
         button.click()
 
-    @allure.step("Ожидание результата '{expected_result}'")
+        with allure.step("Ожидание результата '{expected_result}'")
     """
         Ожидает появления ожидаемого результата на экране калькулятора.
 
@@ -51,7 +56,7 @@ class CalcMainPage:
     def get_screen_text(self):
         wait = WebDriverWait(self._driver, 50)
 
-        @allure.step("Получение результата с экрана калькулятора")
+        with allure.step("Получение результата с экрана калькулятора")
 
         """
             Возвращает текущий результат с экрана калькулятора.
